@@ -84,221 +84,284 @@
           </hgroup>
   </slide>
 
-<slide class=''><hgroup><h2>R Objects</h2></hgroup><article  id="r-objects">
-
-<p>Everything in R is object. Each object has the following properties</p>
+<slide class=''><hgroup><h2>Matrices</h2></hgroup><article  id="matrices">
 
 <ul>
-<li><strong>length</strong>: object length <code>length(rnorm(10))</code></li>
-<li><strong>class</strong>: object class <code>class(rnorm(100))</code>, used to determine appropriate function to call</li>
-<li><strong>mode</strong>: type of storage mode of an object, mode(1:5), typeof(1:5)</li>
-<li><strong>storage mode</strong>: similar to mode, often used to distinguish double and integer</li>
-<li><strong>attributes</strong>: additional attributes of an object. e.g. matrix is a vector with additional attributes</li>
+<li>Matrices are vectors with two additional attributes</li>
+<li><strong>matrix()</strong> is used to create a matrix from a vector</li>
+<li>By default the matrix is filled by column</li>
+<li>Matracies are essential part of statistical models</li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>Vector</h2></hgroup><article  id="vector">
+<pre >m &lt;- matrix(1:12, nrow = 4)
+class(m)
+mode(m)
+length(m)
+attributes(m)
+dim(m)
+nrow(m)
+ncol(m)
+matrix(1:12, nrow = 4, byrow = TRUE)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Matrix arithmetics</h2></hgroup><article  id="matrix-arithmetics">
 
 <ul>
-<li>Vector is fundamental data type in R</li>
-<li><p>Vectors have modes such as: numeric, character, logical, complex</p>
+<li><p>Matrix can be applied operators with a vector like a vector</p>
 
-<pre >mode(1:5)
-mode(c(&quot;a&quot;, &quot;b&quot;))
-mode(c(TRUE, FALSE))
-mode(c(1 + 3i, 2 + 4i))</pre></li>
-<li><p>Elements of a vector must have same mode, otherwise they will be converted to same mode automatically</p>
+<pre >m + 4
+m * 4
+m + c(1, 2, 3) # recycling</pre></li>
+<li><p>While applying operators in two matrices, they must have same dimension</p>
 
-<pre >c(1, &quot;b&quot;)
-c(1, FALSE)
-c(1, 1 + 1i)
-c(1 + 2i, &quot;aaa&quot;)
-c(TRUE, &quot;aa&quot;)</pre></li>
+<pre >x &lt;- matrix(1:4, nrow = 2)
+y &lt;- matrix(1:8, nrow = 4)
+x + y ## will have error</pre></li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>Storage mode of numeric vector</h2></hgroup><article  id="storage-mode-of-numeric-vector">
-
-<p>Numerics may be stored as raw, integer and double</p>
-
-<pre >x &lt;- 1:5
-y &lt;- c(1, 2, 3, 4, 5)
-identical(x, y)
-typeof(x)
-typeof(y)</pre>
-
-<p>Usually, no worries about different storage modes for numerics. R handles them well. However, we can use it to reduce storage of data, useful for Gene data</p>
-
-<pre >x &lt;- sample(c(1, 2, 3, 4), 1000000, replace = TRUE); object.size(x)
-storage.mode(x) &lt;- &quot;integer&quot;; object.size(x)
-storage.mode(x) &lt;- &quot;raw&quot;; object.size(x)</pre>
-
-</article></slide><slide class=''><hgroup><h2>Recycling</h2></hgroup><article  id="recycling">
-
-<p>When operating on two vectors with different length, the shorter one will be recycled</p>
-
-<p><code>c(1, 2, 3) + 2</code> is equivalent to <code>c(1, 2, 3) + c(2, 2, 2)</code></p>
-
-<p><code>c(1, 2, 3, 4) + c(4, 6, 8)</code> is equivalent to <code>c(1, 2, 3, 4) + c(4, 6, 8, 4)</code></p>
-
-<p>Add a column to each column of a matrix</p>
-
-<pre >x &lt;- matrix(1:9, nrow = 3)
-x + c(3, 4, 5)</pre>
-
-</article></slide><slide class=''><hgroup><h2>Vector Indexing</h2></hgroup><article  id="vector-indexing">
+</article></slide><slide class=''><hgroup><h2>Matrix arithmetics</h2></hgroup><article  id="matrix-arithmetics-1">
 
 <ul>
-<li><p>Index with a vector of indices, indcies can be duplicated to select elements repeatedly</p>
+<li><p>Linear algebra</p>
 
-<pre >x &lt;- rnorm(10)
-x[c(1, 4, 5)]
-x[c(1, 1, 5, 5)]</pre></li>
-<li><p>Negative indicies can be used to remove elements</p>
-
-<pre >x[-length(x)] # remove last element</pre></li>
-<li><p>Index with a vector of logical vector with same length</p>
-
-<pre >x &lt;- 1:4
-x[c(TRUE, FALSE, TRUE, FALSE)]
-x[c(TRUE, FALSE)] # use recycling</pre></li>
+<pre >t(m)   # transpose a matrix
+x &lt;- matrix(rnorm(12), nrow = 4)
+y &lt;- matrix(rnorm(12), nrow = 3)
+x %*% y # matrix multiplication</pre></li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>Replacement and ifelse</h2></hgroup><article  id="replacement-and-ifelse">
+<p>Excersise - How to determine if a matrix is symmetric for not?</p>
 
-<pre >x &lt;- 1:10
-x[x &lt; 5] &lt;- 5</pre>
+<p>Or is \(X_{ij} = X_{ji}\) for all i, j?</p>
 
-<p>ifelse is very useful to create a new vector based on two vectors. For example imputing values.</p>
-
-<pre >x &lt;- rnorm(10)
-ifelse(x &lt; 0, 0, x)
-y &lt;- c(NA, 2, 3, 1, NA)
-ifelse(is.na(y), 2, y)</pre>
-
-<pre >gender &lt;- c(&quot;M&quot;, &quot;F&quot;, &quot;F&quot;, &quot;M&quot;)
-age &lt;- c(23, 34, 22, 14)
-ifelse(gender == &quot;F&quot;, age + 5, age + 10)</pre>
-
-</article></slide><slide class=''><hgroup><h2>Create useful vectors</h2></hgroup><article  id="create-useful-vectors">
+</article></slide><slide class=''><hgroup><h2>Matrix arithmetics</h2></hgroup><article  id="matrix-arithmetics-2">
 
 <ul>
-<li><p><code>seq()</code> function to generate a sequence</p>
+<li><p>Matrix multiplication <code>X %*% Y</code> Compute Xbeta</p>
 
-<pre >seq(from = 1, to = 10, by = 2)
-seq(from = 0, to = 100, length.out = 21)</pre></li>
-<li><p><code>seq(x)</code> is safer than using <code>1:length(x)</code></p>
-
-<pre >x &lt;- numeric()
-for (i in seq(x)) print(i)
-for (i in 1:length(x)) print(i)</pre></li>
-<li><p><code>rep()</code> function to generate a repeated vector</p>
-
-<pre >rep(1:3, each = 2)
-rep(1:3, times = 2)</pre></li>
+<pre >X &lt;- model.matrix(~disp + hp, data = mtcars)
+beta &lt;- c(1, .5, .6)
+X %*% beta</pre></li>
+<li><p>Inverse a Matrix: solve(X)</p></li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>any() and all()</h2></hgroup><article  id="any-and-all">
+<p>Example - Solve a linear regression problem: \(\beta=(X^TX)^{-1}X^Ty\)</p>
 
-<p>Two useful functions to do quality check for a vector</p>
+<p>Assume we want to fit a model mpg ~ cyl + carb * gear in mtcars</p>
 
-<pre >any(is.na(x))  # does x contains missing value
-all(x %in% c(&quot;M&quot;, &quot;F&quot;)) # does x only contain M and F
-all(age &gt;= 0 &amp; age &lt;= 120) # make sure age within a range</pre>
+<pre >X &lt;- model.matrix(mpg ~ cyl + carb * gear, data = mtcars) # Get X
+y &lt;- mtcars$mpg # Get y
+beta &lt;- solve(t(X) %*% X)%*%t(X)%*%y # compute beta
+fit &lt;- lm(mpg ~ cyl + carb * gear, data = mtcars) # are they same?</pre>
 
-<p>What is the difference between <strong>&amp;</strong> vs <strong>&amp;&amp;</strong> and <strong>|</strong> vs <strong>||</strong>?</p>
+</article></slide><slide class=''><hgroup><h2>Covariance Matrix</h2></hgroup><article  id="covariance-matrix">
+
+<p>Next we want to do hypothesis testing, so we need to know variance-covariance matrix of \(\beta\)</p>
+
+<p>\(\Sigma=\frac{(y-X\beta)^{T}(y-X\beta)}{N-p}(X^TX)^{-1}\)</p>
+
+<pre >sigma &lt;- t(y - X%*%beta)%*%(y - X%*%beta)/(nrow(X) - ncol(X))
+sigma &lt;- as.numeric(sigma) * solve(t(X) %*% X)
+variances &lt;- diag(sigma)
+stds &lt;- sqrt(variances)
+tvalues &lt;- as.vector(beta) / stds</pre>
+
+<p>are they same as <code>summary(fit)</code></p>
+
+</article></slide><slide class=''><hgroup><h2>Combining matrices</h2></hgroup><article  id="combining-matrices">
 
 <ul>
-<li>&amp; and | performs elementwise comparison and return a vector of comparison</li>
-<li><p>&amp;&amp; and || only performs comparison on the first element and returns single value</p>
-
-<pre >c(FALSE, TRUE) &amp; c(TRUE, TRUE)
-c(FALSE, TRUE) &amp;&amp; c(F, TRUE)</pre></li>
+<li>Combining vertically using <strong>rbind()</strong></li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>NA, NULL</h2></hgroup><article  id="na-null">
+<pre >x &lt;- matrix(1:4, nrow = 2)
+y &lt;- matrix(9:18, ncol = 2)
+rbind(x, y)</pre>
 
 <ul>
-<li><p><strong>NA</strong> refers to not available or missing</p>
+<li><p>Combining horizontally using <strong>cbind()</strong></p>
 
-<pre >x &lt;- c(1, NA)
-is.na(x) # NOTE: x == NA will not work
-length(x)
-mean(c(1, 2, 3, NA), na.rm = TRUE)</pre></li>
-<li><p><strong>NULL</strong> refers nonexistence with no mode. Useful in functions when we want to return nothing</p>
-
-<pre >z &lt;- NULL
-is.null(z)
-length(z)
-c(z, 8)
-x &lt;- c(1, NA)
-y &lt;- if (any(is.na(x))) NULL else mean(x)
-mean(c(1:4, y))</pre></li>
+<pre >x &lt;- matrix(1:4, nrow = 2)
+y &lt;- matrix(9:18, nrow = 2)
+cbind(x, y)</pre></li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>Coercion</h2></hgroup><article  id="coercion">
+</article></slide><slide class=''><hgroup><h2>Matrix indexing</h2></hgroup><article  id="matrix-indexing">
+
+<p>Similar to vector but in two dimensions</p>
+
+<pre >m &lt;- matrix(1:12, nrow = 3)
+m[1:3, 1:2]
+m[-2, -1]
+m[, c(TRUE, TRUE, FALSE, FALSE)]
+m[2, ]  # dimension reduced
+m[, 1]  # dimension reduced
+diag(m)</pre>
+
+<p>to avoid unitended dimension reduction, use drop = FALSE</p>
+
+<pre >m[2, , drop = FALSE]</pre>
+
+<p>we can also reshape the matrix</p>
+
+<pre >dim(m) &lt;- c(6, 2)</pre>
+
+</article></slide><slide class=''><hgroup><h2>rowSums(), colSums(), colMeans(), rowMeans()</h2></hgroup><article  id="rowsums-colsums-colmeans-rowmeans">
+
+<p>This four functions can compute matrix row/col level sum/mean extreme fast</p>
+
+<pre >x &lt;- matrix(rnorm(1e8), nrow = 1e3)
+system.time(apply(x, 1, sum))
+system.time(rowSums(x))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Lists</h2></hgroup><article  id="lists">
 
 <ul>
-<li><p><strong>is.xxx</strong> to check object type</p>
-
-<pre >is.numeric(x)
-is.character(x)
-is.factor(x)
-is.data.frame(mtcars)
-sapply(mtcars, is.numeric)</pre></li>
-<li><p><strong>as.xxx</strong> to convert to different object type</p>
-
-<pre >as.character(1:5)
-as.factor(c(&quot;A&quot;, &quot;b&quot;))
-as.numeric(&quot;2&quot;, &quot;4&quot;, &quot;5&quot;)
-as.Date(&quot;2015-9-9&quot;)</pre></li>
+<li>List is also a vector with mode of <strong>list</strong></li>
+<li>List structure is recursive, we can create a list of list of list&#8230;</li>
+<li>List is a very flexible data structure and is building block of many complex R objects such as model objects</li>
+<li>List component can be any R object, such as vector, matrix, data frame or function</li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>Character functions</h2></hgroup><article  id="character-functions">
+<pre >mylist &lt;- list(1:5, mtcars, rnorm)
+mylist[[3]](10)
+
+class(mylist)
+typeof(mylist)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Create a list</h2></hgroup><article  id="create-a-list">
+
+<p>Use <strong>list()</strong> function to create a list</p>
+
+<pre >j &lt;- list(name = &quot;Joe&quot;, salary = 55000, union = T)</pre>
+
+<p>Use <strong>c()</strong> to conbine lists similar to combining vector</p>
+
+<pre >k &lt;- list(name = &quot;Tom&quot;, salary = 60000, union = F)
+employees &lt;- c(j, k)  # Not desired
+employees &lt;- c(list(j), list(k))
+employees &lt;- list(j, k)</pre>
+
+<p>Create list from emplty list, useful in loops</p>
+
+<pre >employees &lt;- list()
+employees[[&quot;emp1&quot;]] &lt;- j
+employees[[&quot;emp2&quot;]] &lt;- k</pre>
+
+</article></slide><slide class=''><hgroup><h2>Access List elements</h2></hgroup><article  id="access-list-elements">
 
 <ul>
-<li><p><strong>paste</strong> function to concatenate vectors, collpase option to convert the vector to a single string</p>
-
-<pre >paste(&quot;x&quot;, 1:10) # recycling
-paste0(&quot;x&quot;, 1:10) # same as paste(&quot;x&quot;, 1:10, sep = &quot;&quot;)
-paste0(&quot;x&quot;, 1:10, collapse = &quot; + &quot;)
-# Create a model formula
-paste(&quot;Species&quot;, &quot;~&quot;, paste0(names(iris)[-5], collapse = &quot; + &quot;))</pre></li>
-<li><p><strong>sprintf</strong> function contruct strings with placeholder, concise than paste in some cases</p>
-
-<pre >sprintf(&quot;%s have %s candies&quot;, 
-    c(&quot;Tom&quot;, &quot;John&quot;, &quot;I&quot;),
-    c(10, 4, 13))</pre></li>
+<li>Access part of the list using <strong>[]</strong></li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>Character functions</h2></hgroup><article  id="character-functions-1">
+<pre >j[c(&quot;name&quot;, &quot;salary&quot;)]
+j[1:2]
+j[1]</pre>
 
 <ul>
-<li><strong>toupper</strong> to convert strings to upper case</li>
-<li><strong>tolower</strong> to convert strings to lower case</li>
-<li><strong>nchar</strong> to count how many characters in each string</li>
-<li><strong>substring</strong> and <strong>substr</strong> to get a part of a string</li>
-<li><strong>strsplit</strong> to split a string</li>
+<li>Access component using <strong>[[]]</strong> or <strong>$</strong></li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>Named vector</h2></hgroup><article  id="named-vector">
+<pre >j[[&quot;name&quot;]]
+j$union
+j[[2]]
+j[[1:2]]  # Not working
+j[[c(&quot;name&quot;, &quot;salary&quot;)]] # Not working</pre>
 
-<p>Named vector can be very useful as dictionary</p>
+<ul>
+<li><strong>[[]]</strong> vs <strong>[]</strong>: <strong>[]</strong> is used to get a sublist we can providd a vector. <strong>[[]]</strong> is used to access a particular component, we should provide a single name or single index.</li>
+</ul>
 
-<pre >x &lt;- 1:3
-names(x) &lt;- c(&quot;One&quot;, &quot;Two&quot;, &quot;Three&quot;)
-attributes(x)</pre>
+</article></slide><slide class=''><hgroup><h2>Add/Remove elements</h2></hgroup><article  id="addremove-elements">
 
-<pre >states &lt;- c(&quot;MA&quot; = &quot;Massachusetts&quot;, &quot;NY&quot; = &quot;New York&quot;, CA = &quot;California&quot;)
-x &lt;- c(&quot;MA&quot;, &quot;NY&quot;, &quot;CA&quot;, &quot;CA&quot;, &quot;NY&quot;, &quot;MA&quot;)
-states[x]</pre>
+<p>We can do it similar to vector since list is just a vector</p>
 
-<pre >library(ggplot2)
-map &lt;- c(&quot;setosa&quot; = &quot;steelblue&quot;, &quot;versicolor&quot; = &quot;black&quot;,
-          &quot;virginica&quot; = &quot;purple&quot;)
-ggplot(iris, aes(Petal.Length, Sepal.Length, 
-       group = Species, color = Species)) +
-       geom_line() +
-       scale_color_manual(values = map)
-</pre></article></slide>
+<pre >j &lt;- c(j, state = &quot;MA&quot;)
+j$city &lt;- &quot;Amherst&quot;
+j[[&quot;state&quot;]] &lt;- NULL
+j &lt;- j[-(which(names(j) == &quot;city&quot;))]</pre>
+
+<p>Size of list <code>length(j)</code></p>
+
+<p>Names of list <code>names(j)</code></p>
+
+<p>Collpase a list</p>
+
+<pre >x &lt;- list(a = 1:5, b = 10:20)
+unlist(x)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Model object as a list</h2></hgroup><article  id="model-object-as-a-list">
+
+<pre >fit &lt;- lm(mpg ~ cyl + carb * gear, data = mtcars)
+attributes(fit) # it&#39;s a list with class attributes &quot;lm&quot;
+class(fit)
+typeof(fit)  # it&#39;s list, so list operators can be used
+length(fit)
+names(fit)
+fit$coefficients # get model coefficients
+fit$call # get model call
+fit$fitted.values # get fitted values
+class(fit) &lt;- &quot;list&quot;  # convert to list object</pre>
+
+</article></slide><slide class=''><hgroup><h2>Data frame</h2></hgroup><article  id="data-frame">
+
+<ul>
+<li>Data frame is most used object for data analysis and modeling</li>
+<li><p>It looks like matrix, but these 2 are fundamentally different</p>
+
+<pre >class(mtcars)
+mode(mtcars)
+attributes(mtcars)</pre>
+
+<ul>
+<li>Matrix is a vetor, while data frame is a list</li>
+<li>All elements in matrix must have same mode, while data frame only need to have same mode for each column</li>
+</ul></li>
+<li>A data frame is a special list with each component with same length</li>
+<li><p>Similar to SQL data and SAS data</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Create data frame</h2></hgroup><article  id="create-data-frame">
+
+<ul>
+<li><p><strong>data.frame()</strong> function</p>
+
+<pre >data.frame(x = 1:10, 
+       y = letters[1:10])</pre></li>
+<li><p>Read from external file (csv, txt, excel, etc)</p></li>
+<li><p>When creating data frame, we should almost alway set <strong>stringsAsfactors = FALSE</strong>. Factor variables often gives trouble.</p>
+
+<pre >data.frame(x = 1:10, 
+       y = letters[1:10], stringsAsFactors = FALSE)</pre></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Access data frame</h2></hgroup><article  id="access-data-frame">
+
+<p>We can use list operators to access data frame columns</p>
+
+<pre >mtcars[[&quot;cyl&quot;]]
+mtcars$cyl
+mtcars[1:3]
+mtcars[c(&quot;mpg&quot;, &quot;disp&quot;)]</pre>
+
+</article></slide><slide class=''><hgroup><h2>Matrix like operators</h2></hgroup><article  id="matrix-like-operators">
+
+<p>We can extract elements by row and column as for matrix</p>
+
+<pre >mtcars[1:5, 1:4]
+mtcars[1:5, c(&quot;hp&quot;, &quot;cyl&quot;)]
+mtcars[mtcars$cyl == 6, ]</pre>
+
+</article></slide><slide class=''><hgroup><h2>Common data frame operations</h2></hgroup><article  id="common-data-frame-operations">
+
+<ul>
+<li>mutate</li>
+<li>arrange</li>
+<li>select</li>
+<li>group wise operations/aggregations</li>
+<li>data merge</li>
+</ul>
+
+<p>All those can be easily achieved by <strong>dplyr</strong> package. This worths a couple of lecturs to discuss.</p></article></slide>
 
 
   <slide class="backdrop"></slide>
